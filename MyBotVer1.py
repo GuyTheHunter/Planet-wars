@@ -1,40 +1,59 @@
 import math
 
 def do_turn(pw):
-    if len(pw.my_fleets()) >= 1:
-        return
-    if len(pw.my_planets()) == 0:
-        return
+	if len(pw.my_planets()) == 0:
+		return
 	if len(pw.neutral_planets()) == 0 and len(pw.enemy_planets()) == 0:
 		return
 	
-	#s = Source(pw.my_planets())
-    num_ships = Source(pw.my_planets()).num_ships() / 2
+	mainFunc(pw)
 	
-    pw.issue_order(Source(pw.my_planets()), Close(Source(pw.my_planets()), list(set(pw.neutral_planets() + pw.enemy_planets()))), num_ships)
-
+def mainFunc(pw):
+	sources = pw.my_planets()
+	enemies = list(set(pw.neutral_planets() + pw.enemy_planets()))
+	
+	enemy = GetEnemy(enemies)
+	source = GetSource(sources, enemy)
+	num_ships = GetShips(source, enemy)
+	
+	pw.issue_order(source, enemy, num_ships)
+	
 def Distance(source, dest):
 	x = math.pow((source.x() - dest.x()), 2)
 	y = math.pow((source.y() - dest.y()), 2)
 	
 	return math.sqrt(x + y)	
 	
-def Close(source, dests):
-	minIndex = 0
-	Index = 0
-	for dest in dests:
-		if Distance(source, dest) < Distance(source, dests[minIndex]):
-			minIndex = Index
-		Index = Index + 1
-		
-	return dests[minIndex]
+def GetSource(sources, enemy):
+	scores = []
+	score = 0
 	
-def Source(sources):
-	maxIndex = 0
-	Index = 0
-	for s in sources:
-		if s.num_ships() > sources[maxIndex].num_ships():
-			maxIndex = Index
-		Index = Index + 1
+	for source in sources:
+		if source.num_ships() >= enemy.num_ships():
+			score = score + 1
+		if Distance(source, enemy) < 275:
+			score = score + 1
+		scores.append(score)
+		score = 0	
 		
-	return sources[maxIndex]
+	return sources[scores.index(max(scores))]
+	
+def GetEnemy(enemies):
+	scores = []
+	score = 0
+	
+	for enemy in enemies:
+		if enemy.owner() == 0:
+			score = score + 1
+		if enemy.num_ships() < 150:
+			score = score + 1
+		if enemy.growth_rate() >= 3:
+			score = score + 1
+		scores.append(score)
+		score = 0
+	return enemies[scores.index(max(scores))]
+	
+def GetShips(source, dest):
+	if source.num_ships() - dest.num_ships() >= 100:
+		return dest.num_ships() + 40
+	return source.num_ships() / 2	
