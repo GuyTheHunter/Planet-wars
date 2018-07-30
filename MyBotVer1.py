@@ -9,7 +9,7 @@ def do_turn(pw):
 		return
 	
 	#s = Source(pw.my_planets())
-    num_ships = pw.my_planets()[0].num_ships() / 2
+    num_ships = Source(pw.my_planets()).num_ships() / 2
 	
     pw.issue_order(Source(pw.my_planets()), Close(Source(pw.my_planets()), list(set(pw.neutral_planets() + pw.enemy_planets()))), num_ships)
 
