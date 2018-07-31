@@ -13,7 +13,7 @@ def mainFunc(pw):
 	enemies = list(set(pw.neutral_planets() + pw.enemy_planets()))
 	
 	enemy = GetEnemy(enemies)
-	source = GetSource(sources, enemy)
+	source = GetSource(sources, enemy, pw.enemy_planets())
 	num_ships = GetShips(source, enemy)
 	
 	pw.issue_order(source, enemy, num_ships)
@@ -24,14 +24,14 @@ def Distance(source, dest):
 	
 	return math.sqrt(x + y)	
 	
-def GetSource(sources, enemy):
+def GetSource(sources, enemy, enemies):
 	scores = []
 	score = 0
 	
 	for source in sources:
 		if source.num_ships() >= enemy.num_ships():
 			score = score + 1
-		if Distance(source, enemy) < 275:
+		if Distance(source, enemy) < 275 and Distance(source, enemy) <= CloseDistance(enemies, enemy):
 			score = score + 1
 		scores.append(score)
 		score = 0	
@@ -54,6 +54,16 @@ def GetEnemy(enemies):
 	return enemies[scores.index(max(scores))]
 	
 def GetShips(source, dest):
-	if source.num_ships() - dest.num_ships() >= 100:
+	if source.num_ships() >= dest.num_ships() + 100:
 		return dest.num_ships() + 40
 	return source.num_ships() / 2	
+	
+def CloseDistance(enemies, dest):
+	minIndex = 0
+	Index = 0
+	
+	for enemy in enemies:
+		if Distance(enemy, dest) < Distance(enemies[minIndex], dest):
+			minIndex = Index
+		index = Index + 1
+	return Distance(enemies[minIndex], dest)
