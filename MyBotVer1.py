@@ -56,7 +56,7 @@ def GetEnemy(enemies):
 def GetShips(source, dest):
 	if source.num_ships() >= dest.num_ships() + 100:
 		return dest.num_ships() + 48
-	return source.num_ships() / 2	
+	return source.num_ships() / 2
 	
 def CloseDistance(enemies, dest):
 	minIndex = 0
